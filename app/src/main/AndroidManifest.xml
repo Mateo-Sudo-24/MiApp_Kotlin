@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
-    <!-- Permisos de ubicación -->
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example.miapp"> <!-- Asegúrate que este sea tu paquete real -->
+
+    <!-- Permisos necesarios para tus 3 actividades -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-
-    <!-- Permiso de cámara -->
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-feature android:name="android.hardware.camera" android:required="false" />
-
-    <!-- Para guardar fotos (Android 12 y menores) -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
+
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
 
     <application
         android:allowBackup="true"
@@ -21,8 +20,34 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MiApp">
-        <!-- Declarar FileProvider para compartir archivos -->
+        android:theme="@style/Theme.MiApp"
+        tools:targetApi="31">
+
+        <!-- 1. ACTIVIDAD PRINCIPAL (La que se abre al tocar el icono) -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="Menú Principal"
+            android:theme="@style/Theme.MiApp">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- 2. ACTIVIDAD DE CÁMARA (CameraActivity.kt) -->
+        <activity
+            android:name=".CameraActivity"
+            android:exported="false"
+            android:label="Cámara" />
+
+        <!-- 3. ACTIVIDAD DE UBICACIÓN (LocationActivity.kt) -->
+        <activity
+            android:name=".LocationActivity"
+            android:exported="false"
+            android:label="Ubicación" />
+
+        <!-- Proveedor de archivos para la cámara (Necesario para guardar fotos) -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -33,16 +58,5 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <activity
-            android:name=".LocationActivity"
-            android:exported="true"
-            android:label="Ubicación"
-            android:theme="@style/Theme.MiApp">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
     </application>
-
 </manifest>

@@ -14,11 +14,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-// Asegúrate de que este import sea el correcto para tu proyecto
 import com.example.miapp.ui.theme.MiAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -28,7 +29,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             MiAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    // Llamamos a los componentes básicos
                     ComponentesBasicos(modifier = Modifier.padding(innerPadding))
                 }
             }
@@ -38,13 +38,14 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun ComponentesBasicos(modifier: Modifier = Modifier) {
-    // Contexto necesario para navegar entre Activitys
+    // Obtenemos el contexto para poder lanzar los Intents
     val context = LocalContext.current
 
-    // Estados de tus componentes actuales
+    // Estado para los componentes interactivos
     var texto by remember { mutableStateOf("") }
     var checked by remember { mutableStateOf(false) }
     var switchActivo by remember { mutableStateOf(false) }
+    var contador by remember { mutableIntStateOf(0) }
 
     Column(
         modifier = modifier
@@ -53,64 +54,159 @@ fun ComponentesBasicos(modifier: Modifier = Modifier) {
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // 1. TEXT - Texto simple y estilizado
         Text(
-            text = "Formulario de Componentes",
+            text = "Componentes Básicos",
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 16.dp)
+            color = MaterialTheme.colorScheme.primary
         )
 
-        // --- Tus componentes actuales ---
-        OutlinedTextField(
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // 2. TEXTFIELD - Campo de entrada
+        TextField(
             value = texto,
             onValueChange = { texto = it },
-            label = { Text("Introduce texto") },
+            label = { Text("Escribe tu nombre") },
             modifier = Modifier.fillMaxWidth()
         )
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Checkbox(checked = checked, onCheckedChange = { checked = it })
-            Text("Aceptar términos")
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Mostrar lo que escribió el usuario
+        if (texto.isNotEmpty()) {
+            Text(text = "Hola, $texto!", fontSize = 18.sp)
         }
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Switch(checked = switchActivo, onCheckedChange = { switchActivo = it })
-            Text("Activar modo oscuro")
-        }
-
-        Spacer(modifier = Modifier.height(32.dp))
-        HorizontalDivider()
         Spacer(modifier = Modifier.height(16.dp))
 
-        // --- NUEVOS BOTONES DE NAVEGACIÓN ---
+        // 3. BUTTON - Botón
+        Button(onClick = { contador++ }) {
+            Text("Presionado: $contador veces")
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Botón con borde (outlined)
+        OutlinedButton(onClick = { contador = 0 }) {
+            Text("Reiniciar contador")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // 4. ROW - Fila horizontal con Checkbox y Switch
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // CHECKBOX
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Checkbox(
+                    checked = checked,
+                    onCheckedChange = { checked = it }
+                )
+                Text("Acepto")
+            }
+
+            // SWITCH
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("Modo oscuro")
+                Switch(
+                    checked = switchActivo,
+                    onCheckedChange = { switchActivo = it }
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // 5. CARD - Tarjeta
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text("Esta es una Card", fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text("Las cards son útiles para agrupar contenido relacionado.")
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // 6. BOX - Superposición
+        Box(
+            modifier = Modifier
+                .size(100.dp)
+                .padding(8.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Card(
+                modifier = Modifier.fillMaxSize(),
+                colors = CardDefaults.cardColors(containerColor = Color.LightGray)
+            ) {}
+            Text("Centrado", fontWeight = FontWeight.Bold)
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // 7. Texto con color condicional
         Text(
-            text = "Navegación del Sistema",
-            fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.padding(bottom = 12.dp)
+            text = if (switchActivo) "Switch está ON" else "Switch está OFF",
+            color = if (switchActivo) Color.Green else Color.Red,
+            fontWeight = FontWeight.Bold
         )
 
-        // Botón para ir a Cámara
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // --- NUEVA SECCIÓN: BOTONES DE NAVEGACIÓN ---
+        HorizontalDivider(thickness = 2.dp)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = "Navegación de Actividades",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.SemiBold
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Botón para ir a CameraActivity
         Button(
             onClick = {
                 val intent = Intent(context, CameraActivity::class.java)
                 context.startActivity(intent)
             },
-            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)) // Color Verde
         ) {
-            Text("Ir a Cámara")
+            Text("Ir a Cámara", color = Color.White)
         }
 
-        // Botón para ir a Ubicación
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Botón para ir a LocationActivity
         Button(
             onClick = {
                 val intent = Intent(context, LocationActivity::class.java)
                 context.startActivity(intent)
             },
-            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3)) // Color Azul
         ) {
-            Text("Ver Ubicación")
+            Text("Ir a Ubicación", color = Color.White)
         }
+
+        Spacer(modifier = Modifier.height(32.dp))
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ComponentesBasicosPreview() {
+    MiAppTheme {
+        ComponentesBasicos()
     }
 }
